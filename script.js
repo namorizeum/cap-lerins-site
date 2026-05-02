@@ -98,10 +98,23 @@
       /* 🔧 BRANCHEMENT FUTUR : Formspree / Web3Forms / endpoint perso
          fetch('https://formspree.io/f/VOTRE_ID', { ... }) */
 
-      note.textContent = 'Merci ! Votre demande est bien reçue. On vous recontacte rapidement.';
-      note.classList.add('success');
-      form.reset();
-      setTimeout(() => note.scrollIntoView({ behavior: 'smooth', block: 'center' }), 120);
+      const formData = new FormData(form);
+
+      fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(formData).toString()
+      })
+        .then(() => {
+          note.textContent = 'Merci ! Votre demande a bien été envoyée. On vous recontacte rapidement.';
+          note.classList.add('success');
+          form.reset();
+          setTimeout(() => note.scrollIntoView({ behavior: 'smooth', block: 'center' }), 120);
+        })
+        .catch(() => {
+          note.textContent = "Erreur lors de l'envoi. Réessayez ou contactez-nous par WhatsApp.";
+          note.classList.add('error');
+        });
     });
 
     form.querySelectorAll('input, select, textarea').forEach((field) => {
