@@ -68,32 +68,61 @@
 
   // 6. Formulaire de contact (uniquement sur contact.html)
   const form = document.getElementById('contactForm');
-  const note = document.getElementById('formNote');
-  if (form && note) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      note.textContent = '';
-      note.className = 'form-note';
-      form.querySelectorAll('.invalid').forEach((el) => el.classList.remove('invalid'));
+const note = document.getElementById('formNote');
 
-      const data = Object.fromEntries(new FormData(form).entries());
-      const errors = [];
+if (form && note) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    note.textContent = '';
+    note.className = 'form-note';
+    form.querySelectorAll('.invalid').forEach((el) => el.classList.remove('invalid'));
 
-      if (!data.name || data.name.trim().length < 2) errors.push('name');
-      if (!data.phone || data.phone.replace(/\D/g, '').length < 6) errors.push('phone');
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!data.email || !emailRegex.test(data.email)) errors.push('email');
-      if (data.people && (Number(data.people) < 1 || Number(data.people) > 6)) errors.push('people');
+    const data = Object.fromEntries(new FormData(form).entries());
+    const errors = [];
 
-      if (errors.length > 0) {
-        errors.forEach((name) => {
-          const field = form.querySelector(`[name="${name}"]`);
-          if (field) field.classList.add('invalid');
-        });
-        note.textContent = 'Merci de compléter les champs obligatoires correctement.';
+    if (!data.name || data.name.trim().length < 2) errors.push('name');
+    if (!data.phone || data.phone.replace(/\D/g, '').length < 6) errors.push('phone');
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!data.email || !emailRegex.test(data.email)) errors.push('email');
+
+    if (data.people && (Number(data.people) < 1 || Number(data.people) > 6)) errors.push('people');
+
+    if (errors.length > 0) {
+      errors.forEach((name) => {
+        const field = form.querySelector(`[name="${name}"]`);
+        if (field) field.classList.add('invalid');
+      });
+      note.textContent = 'Merci de compléter les champs obligatoires correctement.';
+      note.classList.add('error');
+      return;
+    }
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' }
+      });
+
+      if (response.ok) {
+        note.textContent = 'Merci ! Votre demande a bien été envoyée. On vous recontacte rapidement.';
+        note.classList.add('success');
+        form.reset();
+      } else {
+        note.textContent = "Erreur lors de l'envoi. Réessayez ou contactez-nous par WhatsApp.";
         note.classList.add('error');
-        return;
       }
+    } catch {
+      note.textContent = "Erreur lors de l'envoi. Réessayez ou contactez-nous par WhatsApp.";
+      note.classList.add('error');
+    }
+  });
+
+  form.querySelectorAll('input, select, textarea').forEach((field) => {
+    field.addEventListener('input', () => field.classList.remove('invalid'));
+  });
+}
 
       /* 🔧 BRANCHEMENT FUTUR : Formspree / Web3Forms / endpoint perso
          fetch('https://formspree.io/f/VOTRE_ID', { ... }) */
