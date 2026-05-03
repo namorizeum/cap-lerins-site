@@ -62,11 +62,9 @@
       <div class="contact-form-wrap">
         <h2>Formulaire de demande</h2>
         <p class="lead">Tous les champs marqués d'une étoile sont obligatoires.</p>
-    <form id="contactForm" name="reservation" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="contact-form" novalidate>
-  <input type="hidden" name="form-name" value="reservation" />
-  <p style="display:none;">
-    <label>Ne pas remplir : <input name="bot-field" /></label>
-  </p>
+<form id="contactForm" action="https://formspree.io/f/mnjwjodq" method="POST" class="contact-form" novalidate>
+ <input type="hidden" name="_subject" value="Nouvelle demande de réservation - Cap Lérins" />
+<input type="hidden" name="_language" value="fr" />
           <div class="form-row">
             <label><span>Nom *</span><input type="text" name="name" required placeholder="Votre nom"
                 autocomplete="name" /></label>
