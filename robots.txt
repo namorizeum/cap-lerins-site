@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://cap-lerins.netlify.app/sitemap.xml
+Sitemap: https://namorizeum.github.io/cap-lerins-site/sitemap.xml
