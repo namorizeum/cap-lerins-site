@@ -18,6 +18,7 @@
       burger.setAttribute('aria-expanded', String(isOpen));
       burger.setAttribute('aria-label', isOpen ? 'Fermer le menu' : 'Ouvrir le menu');
     });
+
     nav.querySelectorAll('a').forEach((link) => {
       link.addEventListener('click', () => {
         nav.classList.remove('open');
@@ -41,7 +42,9 @@
   faqItems.forEach((item) => {
     item.addEventListener('toggle', () => {
       if (item.open) {
-        faqItems.forEach((other) => { if (other !== item) other.open = false; });
+        faqItems.forEach((other) => {
+          if (other !== item) other.open = false;
+        });
       }
     });
   });
@@ -61,70 +64,71 @@
         }
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -50px 0px' });
+
     toReveal.forEach((el) => io.observe(el));
   } else {
     toReveal.forEach((el) => el.classList.add('visible'));
   }
 
-  // 6. Formulaire de contact (uniquement sur contact.html)
+  // 6. Formulaire de contact
   const form = document.getElementById('contactForm');
-const note = document.getElementById('formNote');
+  const note = document.getElementById('formNote');
 
-if (form && note) {
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    note.textContent = '';
-    note.className = 'form-note';
-    form.querySelectorAll('.invalid').forEach((el) => el.classList.remove('invalid'));
+  if (form && note) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-    const data = Object.fromEntries(new FormData(form).entries());
-    const errors = [];
+      note.textContent = '';
+      note.className = 'form-note';
+      form.querySelectorAll('.invalid').forEach((el) => el.classList.remove('invalid'));
 
-    if (!data.name || data.name.trim().length < 2) errors.push('name');
-    if (!data.phone || data.phone.replace(/\D/g, '').length < 6) errors.push('phone');
+      const data = Object.fromEntries(new FormData(form).entries());
+      const errors = [];
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!data.email || !emailRegex.test(data.email)) errors.push('email');
+      if (!data.name || data.name.trim().length < 2) errors.push('name');
+      if (!data.phone || data.phone.replace(/\D/g, '').length < 6) errors.push('phone');
 
-    if (data.people && (Number(data.people) < 1 || Number(data.people) > 6)) errors.push('people');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!data.email || !emailRegex.test(data.email)) errors.push('email');
 
-    if (errors.length > 0) {
-      errors.forEach((name) => {
-        const field = form.querySelector(`[name="${name}"]`);
-        if (field) field.classList.add('invalid');
-      });
-      note.textContent = 'Merci de compléter les champs obligatoires correctement.';
-      note.classList.add('error');
-      return;
-    }
+      if (data.people && (Number(data.people) < 1 || Number(data.people) > 6)) errors.push('people');
 
-    try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: { Accept: 'application/json' }
-      });
+      if (errors.length > 0) {
+        errors.forEach((name) => {
+          const field = form.querySelector(`[name="${name}"]`);
+          if (field) field.classList.add('invalid');
+        });
+        note.textContent = 'Merci de compléter les champs obligatoires correctement.';
+        note.classList.add('error');
+        return;
+      }
 
-      if (response.ok) {
-        note.textContent = 'Merci ! Votre demande a bien été envoyée. On vous recontacte rapidement.';
-        note.classList.add('success');
-        form.reset();
-      } else {
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' }
+        });
+
+        if (response.ok) {
+          note.textContent = 'Merci ! Votre demande a bien été envoyée. On vous recontacte rapidement.';
+          note.classList.add('success');
+          form.reset();
+          setTimeout(() => {
+            note.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 120);
+        } else {
+          note.textContent = "Erreur lors de l'envoi. Réessayez ou contactez-nous par WhatsApp.";
+          note.classList.add('error');
+        }
+      } catch {
         note.textContent = "Erreur lors de l'envoi. Réessayez ou contactez-nous par WhatsApp.";
         note.classList.add('error');
       }
-    } catch {
-      note.textContent = "Erreur lors de l'envoi. Réessayez ou contactez-nous par WhatsApp.";
-      note.classList.add('error');
-    }
-  });
+    });
 
-  form.querySelectorAll('input, select, textarea').forEach((field) => {
-    field.addEventListener('input', () => field.classList.remove('invalid'));
-  });
-}
-
-      /* 🔧 BRANCHEMENT FUTUR : Formspree / Web3Forms / endpoint perso
-         fetch('https://formspree.io/f/VOTRE_ID', { ... }) */
-
-      
+    form.querySelectorAll('input, select, textarea').forEach((field) => {
+      field.addEventListener('input', () => field.classList.remove('invalid'));
+    });
+  }
+})();
